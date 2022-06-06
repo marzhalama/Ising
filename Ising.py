@@ -1,11 +1,10 @@
+from code import interact
 import numpy as np
 from sympy.utilities.iterables import multiset_permutations
 from numpy import linalg as LA
 
-def Ising(interaction):
+def Ising(interaction, n):
     sum_energy = []
-    n = 4
-    # interaction = np.array([1, 3, -4])
     set_of_configuration = np.ones((n), dtype=int)
     temp_min_energy = 30.0
     temp_set = np.array([])
@@ -14,7 +13,7 @@ def Ising(interaction):
     for i in range(n+1):
         if i>0: set_of_configuration[i-1] = -1
         for p in multiset_permutations(set_of_configuration):
-            print(p)
+            # print(p)
             su = 0.0
             for d in range(len(p)):
                 if d < len(p)-1:
@@ -30,14 +29,14 @@ def Ising(interaction):
             sum_energy.append(su)
         
 
-    print(sum_energy)
-    print(temp_min_energy, temp_set)
+    print("The spectrum of allowed energy levels of the system:",sum_energy, "\n")
+    print("Min energy:", temp_min_energy, "of the eigenvectors:", temp_set , "\n")
 
 
-def Hamiltonian(interaction):
-    n= 4
+def Hamiltonian(interaction, n):
     Pauli_matrix_z=np.array(([1,0],[0,-1]))
     I=np.array(([1,0], [0,1]))
+
     
     all_matrix = []
     for outside in range(n):
@@ -53,43 +52,24 @@ def Hamiltonian(interaction):
                 line_matrix = np.kron(line_matrix, I)
         
         all_matrix.append(line_matrix)
-
-    for a in range(n+1):
-        if a < a+1:
-            print(a, a+1)
+       
+    Ha = None
+    for a in range(n):
+        # print(all_matrix[a], "\n\n")
+        if a < n-1:
+            tmp = all_matrix[a] * all_matrix[a+1]
+            if Ha is None:
+                Ha = tmp
+            else:
+                Ha += tmp
         else:
-            print(a, 0)
-    print("===================")
-        
-    s_1 = np.kron(Pauli_matrix_z,I)
-    s_1_2 = np.kron(s_1,I)
-    s_1_3 = np.kron(s_1_2,I)
-    sigma_1=s_1_3
-    # print(sigma_1)
-
-    s_2 = np.kron(I,Pauli_matrix_z)
-    s_2_2 = np.kron(s_2,I)
-    s_2_3 = np.kron(s_2_2,I)
-    sigma_2=s_2_3
-    # print(sigma_2)
-
-    s_3 = np.kron(I,I)
-    s_3_2 = np.kron(s_3,Pauli_matrix_z)
-    s_3_3 = np.kron(s_3_2,I)
-    sigma_3=s_3_3
-    # print(sigma_3)
-
-    s_4 = np.kron(I,I)
-    s_4_2 = np.kron(s_4,I)
-    s_4_3 = np.kron(s_4_2,Pauli_matrix_z)
-    sigma_4=s_4_3
-    #print(sigma_4)
-
-    # #print(sum)
-    # print(LA.eigvals(sum))
+            Ha += all_matrix[a] * all_matrix[0]
+    # print(Ha)
+    print("The set of eigenvalues:", LA.eigvals(Ha))
     
 if __name__ == '__main__':
-    x=np.array([1, -2, 5, 2])
-    Ising(x)
-    # Hamiltonian(x)
+    n = 16
+    interaction = np.ones((n), dtype=int) #to do
+    Ising(interaction, n)
+    Hamiltonian(interaction, n)
     
